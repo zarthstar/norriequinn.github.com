@@ -8,8 +8,6 @@
 <body>
 
 <script type="text/javascript">
-	
-var accessToken;
 
 function setAccessToken() {
 	hash = location.hash;
@@ -17,6 +15,7 @@ function setAccessToken() {
       accessToken = hash.match(/[?&#]access_token=([^&]*)?/)[1];
       if (accessToken){
         sessionStorage.setItem( 'accessToken', accessToken );
+        window.location.hash = "";
       }
     } else {
     	accessToken = sessionStorage.getItem('accessToken');
@@ -30,9 +29,8 @@ function setAccessToken() {
 }
 
 function requestResource() {
-    setAccessToken();
-    
-  if(accessToken){
+
+  if(sessionStorage.getItem('accessToken')){
     $("token").text(accessToken);
 
     $.ajax({
