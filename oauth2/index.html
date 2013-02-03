@@ -1,59 +1,55 @@
 <html>
 <head>
-<title>jQuery Hello World</title>
- 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+<title>JQuery OAuth Sample</title>
 
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
 </head>
 
 <body>
 
 <script type="text/javascript">
+	
+var accessToken;
 
-//look for an access token in the query string
-uri = window.location.href;
-search = '#access_token=';
-start = uri.indexOf(search);
-var accessToken = "";
-authenticated = false;
-
-function getAccessToken() {
-    return location.hash.match(/[?&#]access_token=([^&]*)?/)[1];
+function setAccessToken() {
+	hash = location.hash;
+	if (hash) {
+      accessToken = hash.match(/[?&#]access_token=([^&]*)?/)[1];
+      if (accessToken){
+        sessionStorage.setItem( 'accessToken', accessToken );
+      }
+    } else {
+    	accessToken = sessionStorage.getItem('accessToken');
+    }
+    
+    $.ajaxSetup({
+        headers: {
+          'Authorization': "Bearer " + accessToken
+        }
+      });
 }
-
-function setHeader(xhr) {
-    xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
-}
-
-
 
 function requestResource() {
-	if (!accessToken){
-	    accessToken = getAccessToken();
-	    console.log(accessToken);
-	    $("token").text(accessToken);
-	}
-	
+    setAccessToken();
+    
   if(accessToken){
+    $("token").text(accessToken);
 
     $.ajax({
         url:'https://i-3673ff04.workdaysuv.com/ccx/api/v1/oms/countries',
         dataType: "json",
-        beforeSend: setHeader,
         success:function(response) {
-            console.dir(response);
             $("data").text(response.total);
         },
         error: function(jqXHR, textStatus, errorThrown){
-            console.error(errorThrown);
+            sessionStorage.removeItem( 'accessToken');
         }
     });
   }
 }
 
-
-
-$(document).ready(function(){
+$(document).ready(function() {
+    setAccessToken();
 	requestResource();
 });
  
