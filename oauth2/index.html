@@ -34,7 +34,7 @@ function requestResource() {
     $("token").text(accessToken);
 
     $.ajax({
-        url:'https://i-3673ff04.workdaysuv.com/ccx/api/v1/oms/countries',
+        url: localStorage.getItem('settings-api' + '/countries'),
         dataType: "json",
         success:function(response) {
             $("data").text(response.total);
@@ -47,12 +47,13 @@ function requestResource() {
 }
 
 $(document).ready(function() {
+	$('#auth').attr('href', localStorage.getItem('settings-auth') + '?response_type=token&client_id=' + localStorage.getItem('settings-appKey'));
     setAccessToken();
 	requestResource();
 });
  
 </script>
-<a href='https://i-3673ff04.workdaysuv.com/oms/authorize?response_type=token&client_id=YWI1MTlhZWEtZTgwNy00ZjM3LWJiZWUtZWFkZmNkMzQ4YmJh'>Sign In</a>
+<a id="auth">Sign In</a>
 <div><b>Token:</b> <token/></div>
 <div><b>Data:</b> <data/></div>
  
