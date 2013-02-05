@@ -34,7 +34,7 @@ function requestResource() {
     $("token").text(accessToken);
 
     $.ajax({
-        url: localStorage.getItem('settings-api' + '/countries'),
+        url: localStorage.getItem('settings-api') + '/countries',
         dataType: "json",
         success:function(response) {
             $("data").text(response.total);
