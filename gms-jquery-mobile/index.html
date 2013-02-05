@@ -4,22 +4,23 @@
   <head>
     <title>Global Modern Services</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="jquery/jquery.mobile-1.2.0.min.css" />
-    <link rel="stylesheet" href="main.css" />
+    <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+    <link rel="stylesheet" href="css/main.css" />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script type="text/javascript" src="jquery/jquery.mobile-1.2.0.min.js"></script>
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
   </head>
   
   <body>
     <div data-role="page" id="main" data-theme="a">
       <div data-role="header" data-theme="a" align="center">
-        <img src="gms.png" />
+        <img src="images/gms.png" />
+        <a id="auth">Sign In</a>
       </div>
       <div data-role="navbar">
         <ul id="menulist">
-          <li><a href="#workers"><img src="workers.png" class="ui-li-icon"><h4>Workers</h4></a>
+          <li><a href="#workers"><img src="images/workers.png" class="ui-li-icon"><h4>Workers</h4></a>
           </li>
-          <li><a href="#myInbox"><img src="inbox.png" class="ui-li-icon"><h4>My Inbox</h4></a>
+          <li><a href="#myInbox"><img src="images/inbox.png" class="ui-li-icon"><h4>My Inbox</h4></a>
           </li>
         </ul>
       </div>
@@ -27,7 +28,7 @@
     
     <div data-role="page" id="workers" data-add-back-btn="true" data-theme="a">
       <div data-role="header" data-theme="a" align="center">
-        <img src="gms.png" />
+        <img src="images/gms.png" />
       </div>
       <div data-role="content">
          <h2>Workers</h2>
@@ -41,20 +42,23 @@
     
     <div data-role="page" id="worker" data-add-back-btn="true" data-theme="a">
       <div data-role="header" data-theme="a" align="center">
-        <img src="gms.png" />
+        <img src="images/gms.png" />
       </div>
       <div data-role="content">
-        <img id="worker-photo" align="right"/>
         <h2 id="worker-name" />
         <h3 id="worker-businessTitle" />
+      </div>
+      <div data-role="content">
+        <h3 id="worker-fullWorkAddress" />
       </div>
       <div>
         <ul id="workerActions" data-role="listview" data-inset="true" data-theme="a"></ul>
       </div>
     </div>
+    
     <div data-role="page" id="historyPage" data-add-back-btn="true" data-theme="a">
       <div data-role="header" data-theme="a" align="center">
-        <img src="gms.png" />
+        <img src="images/gms.png" />
       </div>
       <div data-role="content">
          <h2>Worker History</h2>
@@ -67,7 +71,7 @@
     
     <div data-role="page" id="myInbox" data-add-back-btn="true" data-theme="a">
       <div data-role="header" data-theme="a" align="center">
-        <img src="gms.png" />
+        <img src="images/gms.png" />
       </div>
       <div data-role="content">
          <h2>My Inbox</h2>
@@ -79,7 +83,7 @@
     <div data-role="page" id="businessTitleEdit" data-add-back-btn="true"
     data-theme="a">
       <div data-role="header" data-theme="a" align="center">
-        <img src="gms.png" />
+        <img src="images/gms.png" />
       </div>
       <div id="workerView" data-role="content">
         <p id="workerName" />
@@ -97,7 +101,7 @@
     <div data-role="page" id="inboxTaskReview" data-add-back-btn="true"
     data-theme="a">
       <div data-role="header" data-theme="a" align="center">
-        <img src="gms.png" />
+        <img src="images/gms.png" />
       </div>
       <div data-role="content">
         <p id="reviewWorkerName" />
@@ -116,6 +120,25 @@
     var workerOffset = 0;
     var reviewTask;
 
+    function setAccessToken() {
+        hash = location.hash;
+        if (hash) {
+          accessToken = hash.match(/[?&#]access_token=([^&]*)?/)[1];
+          if (accessToken){
+            sessionStorage.setItem( 'accessToken', accessToken );
+//            window.location.hash = "";
+          }
+        } else {
+            accessToken = sessionStorage.getItem('accessToken');
+        }
+        
+        $.ajaxSetup({
+            headers: {
+              'Authorization': "Bearer " + accessToken
+            }
+          });
+    }
+    
     function inboxTaskReview(href, businessTitleChangeHref) {
       $.getJSON(businessTitleChangeHref, function (data) {
         event = data;
@@ -148,7 +171,7 @@
         }
 
         $.each(data.data, function (key, worker) {
-          $('#workersList').append('<li><a href="javascript:void(0)" onClick="showWorker(\'' + worker.href + '\')"><img src="worker.png" class="ui-li-icon"><h4>' + worker.descriptor + '</h4><p>' + worker.primaryWorkEmail + '</p></a></li>');
+          $('#workersList').append('<li><a href="javascript:void(0)" onClick="showWorker(\'' + worker.href + '\')"><img src="images/worker.png" class="ui-li-icon"><h4>' + worker.descriptor + '</h4><p>' + worker.primaryWorkEmail + '</p></a></li>');
         });
 
         $('#workersList').listview('refresh');
@@ -159,7 +182,7 @@
       $.getJSON(href, function (data) {
         $('#worker-name').text(data.descriptor);
         $('#worker-businessTitle').text(data.businessTitle);
-        $('#worker-photo').attr('src', data.photo.href);
+        $('#worker-fullWorkAddress').html(data.fullWorkAddress);
 
         $('#workerActions').empty();
         $('#workerActions').append('<li><a href="javascript:void(0)" onClick="showHistory(\'' + data.history + '\')"><h4>History</h4></a></li>');
@@ -178,7 +201,7 @@
       $.getJSON(href, function (data) {
         $('#historyList').empty();
         $.each(data.data, function (key, businessProcess) {
-          $('#historyList').append('<li><img src="worker.png" class="ui-li-icon"><h4>' + businessProcess.descriptor + '</h4><p>' + businessProcess.status + '</p></li>');
+          $('#historyList').append('<li><img src="images/worker.png" class="ui-li-icon"><h4>' + businessProcess.descriptor + '</h4><p>' + businessProcess.status + '</p></li>');
           $('#historyList').listview('refresh');
         });
       });
@@ -191,19 +214,15 @@
         $('#myInboxTaskList').empty();
 
         $.each(data.data, function (key, task) {
-          $('#myInboxTaskList').append('<li><a href="" onClick="inboxTaskReview(\'' + task.href + '\', \'' + task.overallProcess.href + '\')"><img src="worker.png" class="ui-li-icon"><h5>' + task.overallProcess.descriptor + '</h5><p>' + task.stepType.descriptor + '</p><p>' + task.status.descriptor + '</p></a></li>');
+          $('#myInboxTaskList').append('<li><a href="" onClick="inboxTaskReview(\'' + task.href + '\', \'' + task.overallProcess.href + '\')"><img src="images/worker.png" class="ui-li-icon"><h5>' + task.overallProcess.descriptor + '</h5><p>' + task.stepType.descriptor + '</p><p>' + task.status.descriptor + '</p></a></li>');
         });
 
         $('#myInboxTaskList').listview('refresh');
       });
     };
 
-    $.ajaxSetup({
-      xhrFields: {
-        withCredentials: true
-      },
-      crossDomain: true
-    });
+    $('#auth').attr('href', localStorage.getItem('settings-auth') + '?response_type=token&client_id=' + localStorage.getItem('settings-appKey'));
+    setAccessToken();
 
     $('#businessTitleForm').submit(function () {
       var data = {
