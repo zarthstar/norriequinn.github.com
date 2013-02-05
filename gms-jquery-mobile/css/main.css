@@ -1,0 +1,18 @@
+#myWorkerDiv {
+  position: absolute;
+  top: 0px;
+  width: 100%;
+}
+
+#myWorkerName {
+text-align: right;
+margin-right:15px;
+}
+
+#reviewWorkerName {
+font-weight: bold
+}
+
+#workerName {
+font-weight: bold
+}
